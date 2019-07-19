@@ -1,4 +1,5 @@
 # Sensu-Go-Slack-bot
+TravisCI: [![TravisCI Build Status](https://travis-ci.org/betorvs/sensu-go-slack-bot.svg?branch=master)](https://travis-ci.org/betorvs/sensu-go-slack-bot)
 
 A simple slack bot create using slash commands integration to communicate with Sensu-Go API.
 
