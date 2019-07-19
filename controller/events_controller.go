@@ -49,7 +49,7 @@ func ReceiveEvents(c echo.Context) (err error) {
 		return c.JSON(http.StatusForbidden, nil)
 	}
 	go log.Printf("[AUDIT] User: %s, Executed: %s", data.UserName, data.Text)
-	res, err := usecase.SlashCommandHandler(data, c)
+	res, err := usecase.SlashCommandHandler(data)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}

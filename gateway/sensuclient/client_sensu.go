@@ -45,12 +45,18 @@ func basicAuth() (string, error) {
 	}
 	sensuURL := fmt.Sprintf("%s/auth", config.SensuGoURL)
 	req, err := http.NewRequest("GET", sensuURL, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 	req.SetBasicAuth(config.SensuGoUser, config.SensuGoSecret)
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatal(err)
 	}
 	bodyText, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("[ERROR]: %s", err)
+	}
 	data := new(sensuToken)
 	json.Unmarshal(bodyText, &data)
 	defer resp.Body.Close()
@@ -125,6 +131,9 @@ func sensuGet(token string, url string) (string, string, error) {
 		Timeout: time.Second * 10,
 	}
 	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 	var bearer = "Bearer " + token
 	req.Header.Add("Authorization", bearer)
 	resp, err := client.Do(req)
@@ -132,6 +141,9 @@ func sensuGet(token string, url string) (string, string, error) {
 		log.Fatal(err)
 	}
 	bodyText, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("[ERROR] %s", err)
+	}
 	var result map[string]interface{}
 	json.Unmarshal(bodyText, &result)
 	check := result["check"].(map[string]interface{})
@@ -148,6 +160,9 @@ func sensuPost(token string, url string, body []byte) (string, string, error) {
 		Timeout: time.Second * 10,
 	}
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
+	if err != nil {
+		log.Fatal(err)
+	}
 	var bearer = "Bearer " + token
 	req.Header.Add("Authorization", bearer)
 	req.Header.Set("Content-Type", "application/json")
@@ -156,6 +171,9 @@ func sensuPost(token string, url string, body []byte) (string, string, error) {
 		log.Fatal(err)
 	}
 	bodyText, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("[ERROR] %s", err)
+	}
 	s := string(bodyText)
 	defer resp.Body.Close()
 	return resp.Status, s, nil

@@ -6,30 +6,39 @@ import (
 	"encoding/hex"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 
 	"github.com/betorvs/sensu-go-slack-bot/config"
 	"github.com/betorvs/sensu-go-slack-bot/gateway/sensuclient"
-	"github.com/labstack/echo"
 	"github.com/nlopes/slack"
 )
 
 // SlashCommandHandler func handle with event received and return a message to controller
-func SlashCommandHandler(data *slack.SlashCommand, c echo.Context) (slack.Msg, error) {
+func SlashCommandHandler(data *slack.SlashCommand) (slack.Msg, error) {
 	var res slack.Msg
 	switch data.Command {
 	case "/sensu-go":
 		values := strings.Fields(data.Text)
-		action := values[0]
-		check := values[1]
-		server := values[2]
-		namespace := values[3]
-		go sensuclient.Connect(action, check, server, namespace, data.UserID, data.ChannelID)
-		text := fmt.Sprintf("Check: %s, Server: %s, Namespace: %s, Processing...", check, server, namespace)
-		message := slack.Msg{
-			ResponseType: "in_channel",
-			Text:         text}
-		res = message
+		length := len(values)
+		if length < 4 || length > 4 {
+			text := fmt.Sprintf("Not processed: Wrong number of fields %s", strconv.Itoa(length))
+			message := slack.Msg{
+				ResponseType: "in_channel",
+				Text:         text}
+			res = message
+		} else {
+			action := values[0]
+			check := values[1]
+			server := values[2]
+			namespace := values[3]
+			go sensuclient.Connect(action, check, server, namespace, data.UserID, data.ChannelID)
+			text := fmt.Sprintf("Check: %s, Server: %s, Namespace: %s, Processing...", check, server, namespace)
+			message := slack.Msg{
+				ResponseType: "in_channel",
+				Text:         text}
+			res = message
+		}
 
 	default:
 		log.Printf("[ERROR] Invalid slash command received: %s", data.Command)
