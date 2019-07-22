@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "sensu-go-slack-bot.fullname" . }}-test-connection"
+  labels:
+{{ include "sensu-go-slack-bot.labels" . | indent 4 }}
+  annotations:
+    "helm.sh/hook": test-success
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args:  ['{{ include "sensu-go-slack-bot.fullname" . }}:{{ .Values.service.port }}{{ .Values.testPathEndpoint }}']
+  restartPolicy: Never

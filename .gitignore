@@ -1,6 +1,3 @@
 vendor/
 .vscode*
 
-sensu-go-slack-bot
-values-prod.yaml
-secrets.yaml
