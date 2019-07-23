@@ -5,6 +5,26 @@ A simple slack bot create using slash commands integration to communicate with S
 
 ![](https://media.giphy.com/media/YSr3jO6YncW1FQ85Ll/giphy.gif)
 
+## Go Installation
+
+Install go
+
+Install dependencies [dep](https://golang.github.io/dep/docs/installation.html)
+
+### Configure
+
+```sh
+dep ensure -update -v
+```
+
+### Run
+
+```sh
+go build
+./sensu-go-slack-bot
+```
+
+
 ## Create a App in Slack
 
 Add feature Slash Command with these parameters:
