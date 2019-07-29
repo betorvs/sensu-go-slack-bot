@@ -11,11 +11,15 @@ install:
 - go get github.com/jgautheron/goconst/cmd/goconst
 - go get github.com/kisielk/errcheck
 - go get github.com/golang/dep/cmd/dep
+- go get golang.org/x/tools/cmd/cover
+- go get github.com/mattn/goveralls
 - dep ensure
 script:
 - gometalinter.v1 --vendor --disable-all --enable=vet --enable=ineffassign
   --enable=goconst --tests ./...
 - go test -v -race ./...
+- go test -v -covermode=count -coverprofile=coverage.out
+- $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
 - docker build -f Dockerfile -t betorvs/sensu-go-slack-bot:$COMMIT .
 
 env:
