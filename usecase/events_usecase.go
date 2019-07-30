@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/betorvs/sensu-go-slack-bot/config"
 	"github.com/betorvs/sensu-go-slack-bot/gateway/sensuclient"
 	"github.com/nlopes/slack"
 )
@@ -51,8 +50,8 @@ func SlashCommandHandler(data *slack.SlashCommand) (slack.Msg, error) {
 }
 
 // ValidateBot func to validate auth from Slack Bot
-func ValidateBot(timestamp string, signing string, message string) bool {
-	mac := hmac.New(sha256.New, []byte(config.SlackSigningSecret))
+func ValidateBot(signing string, message string, mysigning string) bool {
+	mac := hmac.New(sha256.New, []byte(mysigning))
 	if _, err := mac.Write([]byte(message)); err != nil {
 		log.Printf("mac.Write(%v) failed\n", message)
 		return false

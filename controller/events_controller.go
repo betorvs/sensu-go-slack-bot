@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/betorvs/sensu-go-slack-bot/config"
 	"github.com/betorvs/sensu-go-slack-bot/usecase"
 	"github.com/labstack/echo"
 	"github.com/nlopes/slack"
@@ -44,7 +45,7 @@ func ReceiveEvents(c echo.Context) (err error) {
 	slackSignature := c.Request().Header.Get("X-Slack-Signature")
 
 	basestring := fmt.Sprintf("v0:%s:%s", slackRequestTimestamp, bodyString)
-	verifier := usecase.ValidateBot(slackRequestTimestamp, slackSignature, basestring)
+	verifier := usecase.ValidateBot(slackSignature, basestring, config.SlackSigningSecret)
 	if verifier != true {
 		return c.JSON(http.StatusForbidden, nil)
 	}
