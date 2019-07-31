@@ -53,6 +53,7 @@ testPathEndpoint: "/sensu-go-bot/v1/health"
 metricsPathEndpoint: "/sensu-go-bot/v1/metrics"
 sensuUser: "sensu-go-bot"
 sensuURL: "https://sensu.domain.local:8080"
+slackChannel: "C8Y4G3WNB"
 #sensuSecret: 
 #slackToken: "xoxp-"
 #slackSigningSecret: 

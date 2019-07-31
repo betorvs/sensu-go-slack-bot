@@ -33,6 +33,8 @@ spec:
             value: "{{ .Values.sensuUser }}"
           - name: SENSU_URL
             value: "{{ .Values.sensuURL }}"
+          - name: SLACK_CHANNEL
+            value: "{{ .Values.slackChannel }}"
           - name: SENSU_SECRET
             valueFrom: 
               secretKeyRef:
