@@ -17,6 +17,7 @@ func main() {
 	}))
 
 	g.GET("/health", controller.CheckHealth)
+	g.GET("/healthcomplete", controller.CompleteCheck)
 	g.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
 	g.POST("/events", controller.ReceiveEvents)
 

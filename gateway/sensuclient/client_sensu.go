@@ -185,3 +185,22 @@ func sensuPost(token string, url string, body []byte) (string, string, error) {
 	defer resp.Body.Close()
 	return resp.Status, s, nil
 }
+
+// SensuHealth func
+func SensuHealth(url string) (string, error) {
+	client := &http.Client{
+		Timeout: time.Second * 3,
+	}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		fmt.Printf("[ERROR]: %s", err)
+		return "", err
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Printf("[ERROR]: %s", err)
+		return "", err
+	}
+	defer resp.Body.Close()
+	return resp.Status, nil
+}

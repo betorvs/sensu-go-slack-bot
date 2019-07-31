@@ -3,6 +3,8 @@ package slackclient
 import (
 	"fmt"
 	"log"
+	"net/http"
+	"time"
 
 	"github.com/betorvs/sensu-go-slack-bot/config"
 	"github.com/nlopes/slack"
@@ -55,4 +57,26 @@ func EphemeralFileMessage(channel string, user string, message string, title str
 		log.Printf("Unexpected error: %s", err)
 	}
 	return nil
+}
+
+// HealthSlack func
+func HealthSlack(url string, token string) (string, error) {
+	client := &http.Client{
+		Timeout: time.Second * 5,
+	}
+	req, err := http.NewRequest("POST", url, nil)
+	if err != nil {
+		log.Printf("[ERROR]: %s", err)
+		return "", err
+	}
+	var bearer = "Bearer " + token
+	req.Header.Add("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Printf("[ERROR]: %s", err)
+		return "", err
+	}
+	defer resp.Body.Close()
+	return resp.Status, nil
 }
