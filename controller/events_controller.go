@@ -49,6 +49,9 @@ func ReceiveEvents(c echo.Context) (err error) {
 	if verifier != true {
 		return c.JSON(http.StatusForbidden, nil)
 	}
+	if data.ChannelID != config.SlackChannel {
+		return c.JSON(http.StatusForbidden, nil)
+	}
 	go log.Printf("[AUDIT] User: %s, Executed: %s", data.UserName, data.Text)
 	res, err := usecase.SlashCommandHandler(data)
 	if err != nil {

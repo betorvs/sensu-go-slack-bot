@@ -132,24 +132,31 @@ func sensuGet(token string, url string) (string, string, error) {
 	}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Printf("[ERROR]: %s", err)
+		// log.Fatal(err)
 	}
 	var bearer = "Bearer " + token
 	req.Header.Add("Authorization", bearer)
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Printf("[ERROR]: %s", err)
+		// log.Fatal(err)
 	}
 	bodyText, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("[ERROR] %s", err)
 	}
-	var result map[string]interface{}
-	json.Unmarshal(bodyText, &result)
-	check := result["check"].(map[string]interface{})
-	entity := result["entity"].(map[string]interface{})
-	details := entity["system"].(map[string]interface{})
-	s := fmt.Sprintf("Hostname: %s, %s, %s, Check Output: \n%s", details["hostname"], details["platform"], details["platform_version"], check["output"])
+	var s string
+	if resp.StatusCode == 200 {
+		var result map[string]interface{}
+		json.Unmarshal(bodyText, &result)
+		check := result["check"].(map[string]interface{})
+		entity := result["entity"].(map[string]interface{})
+		details := entity["system"].(map[string]interface{})
+		s = fmt.Sprintf("Hostname: %s, %s, %s, Check Output: \n%s", details["hostname"], details["platform"], details["platform_version"], check["output"])
+	} else {
+		s = "Not Found"
+	}
 	defer resp.Body.Close()
 	return resp.Status, s, nil
 }

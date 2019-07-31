@@ -12,6 +12,8 @@ var (
 	SlackToken string
 	// SlackSigningSecret string
 	SlackSigningSecret string
+	// SlackChannel string
+	SlackChannel string
 	// SensuGoURL string
 	SensuGoURL string
 	// SensuGoUser string
@@ -36,6 +38,10 @@ func init() {
 	SlackToken = os.Getenv("SLACK_TOKEN")
 	if SlackToken == "" {
 		log.Fatal("variable SLACK_TOKEN not defined")
+	}
+	SlackChannel = os.Getenv("SLACK_CHANNEL")
+	if SlackChannel == "" {
+		log.Fatal("variable SLACK_CHANNEL not defined")
 	}
 	SensuGoURL = os.Getenv("SENSU_URL")
 	if SensuGoURL == "" {
