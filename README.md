@@ -3,7 +3,10 @@ TravisCI: [![TravisCI Build Status](https://travis-ci.org/betorvs/sensu-go-slack
 
 A simple slack bot create using slash commands integration to communicate with Sensu-Go API.
 
-![](https://media.giphy.com/media/YSr3jO6YncW1FQ85Ll/giphy.gif)
+![](https://media.giphy.com/media/lTdpTLvWnI2W3WS1u2/giphy.gif)
+
+Now with insctructions when received a wrong command:
+![](https://media.giphy.com/media/fY4wKlC3AazbDKF1ds/giphy.gif)
 
 ## Go Installation
 
@@ -31,7 +34,7 @@ Add feature Slash Command with these parameters:
 * Command: `/sensu-go`
 * Request URL: `https://URL/sensu-go-bot/v1/events`
 * Short Description: `Talk with Monitoring System Sensu Go `
-* Usage Hint: `[get|execute|silence] [check] [server] [namespace]`
+* Usage Hint: `[get|execute|silence|describe] [check-name|check|entity] [check-name|server-name] [namespace]`
 
 TIP: instead namespace, configure with namespace itself, like: prod|stg.
 
@@ -51,10 +54,20 @@ I create the sensu-go-slack-bot using these commands:
 ```sh
 sensuctl user create sensu-go-bot --password "LONGPASSWORD"
 
-sensuctl cluster-role create sensu-go-bot-role --verb get,list,create,update --resource checks,events,silenced --namespace prod
+sensuctl cluster-role create sensu-go-bot-role --verb get,list,create,update --resource checks,events,silenced,entities --namespace prod
 
 sensuctl cluster-role-binding create sensu-go-bot-rolebinding --cluster-role=sensu-go-bot-role --user=sensu-go-bot --namespace prod
 
+```
+
+### For test, use sensu-go in docker:
+
+For more details, please consult [sensu-go](https://docs.sensu.io/sensu-go/latest/installation/install-sensu/)
+
+```sh
+$ docker run -d --name sensu-backend -p 2380:2380 -p 3000:3000 -p 8080:8080 -p 8081:8081 sensu/sensu:latest sensu-backend start
+$ docker run --link sensu-backend -d --name sensu-agent sensu/sensu:latest sensu-agent start --backend-url ws://sensu-backend:8081 --subscriptions webserver,system --cache-dir /var/lib/sensu
+$ sensuctl configure -n --username 'admin' --password 'P@ssw0rd!' --namespace default --url 'http://127.0.0.1:8080'
 ```
 
 ## Configuration 
@@ -67,6 +80,7 @@ Configure these environment variables:
 * **SENSU_SECRET**"" : Sensu bot password 
 * **SLACK_TOKEN** : App token from Oauth in Slack (start with xoxb-)
 * **SLACK_SIGNING_SECRET** : App Signing secret from Slack App.
+* **SLACK_CHANNEL** : Channel to listen.
 
 In Kubernetes deployments you can use secrets for these 3 last variables.
 
@@ -119,6 +133,16 @@ To get the results:
 /sensu-go get list-process server-hostname default
 ```
 
+### Executions in Slack
+
+Execute a check:
+![](https://media.giphy.com/media/L2fofmYgYeWFTOKy8p/giphy.gif)
+
+Get a result:
+![](https://media.giphy.com/media/huVF9yP2Fc2csGJJ76/giphy.gif)
+
+Describe a entity (Server):
+![](https://media.giphy.com/media/XFw9ZdmdKGgkmUIQ9Z/giphy.gif)
 
 ## Reference
 

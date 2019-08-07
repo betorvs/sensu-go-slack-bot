@@ -20,6 +20,8 @@ var (
 	SensuGoUser string
 	// SensuGoSecret string
 	SensuGoSecret string
+	// SensuSlashCommand string
+	SensuSlashCommand string
 )
 
 func getEnv(key, defaultValue string) string {
@@ -31,6 +33,7 @@ func getEnv(key, defaultValue string) string {
 
 func init() {
 	Port = getEnv("SERVER_PORT", "9090")
+	SensuSlashCommand = getEnv("SENSU_SLASH_COMMAND", "/sensu-go")
 	SlackSigningSecret = os.Getenv("SLACK_SIGNING_SECRET")
 	if SlackSigningSecret == "" {
 		log.Fatal("variable SLACK_SIGNING_SECRET not defined")

@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/betorvs/sensu-go-slack-bot/config"
 	"github.com/betorvs/sensu-go-slack-bot/gateway/sensuclient"
 	"github.com/nlopes/slack"
 )
@@ -17,7 +18,7 @@ import (
 func SlashCommandHandler(data *slack.SlashCommand) (slack.Msg, error) {
 	var res slack.Msg
 	switch data.Command {
-	case "/sensu-go":
+	case config.SensuSlashCommand:
 		values := strings.Fields(data.Text)
 		length := len(values)
 		if length < 4 || length > 4 {

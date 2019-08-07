@@ -13,6 +13,12 @@ import (
 	"github.com/betorvs/sensu-go-slack-bot/gateway/slackclient"
 )
 
+const (
+	outputJSON   = "json"
+	outputParsed = "parsed"
+	notFound     = "Not Found"
+)
+
 // sensuToken struct
 type sensuToken struct {
 	AccessToken  string `json:"access_token,omitempty"`
@@ -72,7 +78,7 @@ func Connect(action string, check string, server string, namespace string, useri
 	switch action {
 	case "get":
 		sensuURL := fmt.Sprintf("%s/api/core/v2/namespaces/%s/events/%s/%s", config.SensuGoURL, namespace, server, check)
-		s, body, err := sensuGet(token, sensuURL)
+		s, body, err := sensuGet(token, sensuURL, outputParsed)
 		if err != nil {
 			log.Printf("[ERROR]: %s", err)
 		}
@@ -120,13 +126,39 @@ func Connect(action string, check string, server string, namespace string, useri
 		text := fmt.Sprintf("Check: %s, Server: %s, Namespace: %s, Response: %s", check, server, namespace, s)
 		go slackclient.EphemeralMessage(channel, userid, text)
 
+	case "describe":
+		switch check {
+		case "check":
+			sensuURL := fmt.Sprintf("%s/api/core/v2/namespaces/%s/checks/%s", config.SensuGoURL, namespace, server)
+			s, body, err := sensuGet(token, sensuURL, outputJSON)
+			if err != nil {
+				log.Printf("[ERROR]: %s", err)
+			}
+			go slackclient.EphemeralFileMessage(channel, userid, body, s)
+
+		case "entity":
+			sensuURL := fmt.Sprintf("%s/api/core/v2/namespaces/%s/entities/%s", config.SensuGoURL, namespace, server)
+			s, body, err := sensuGet(token, sensuURL, outputJSON)
+			if err != nil {
+				log.Printf("[ERROR]: %s", err)
+			}
+			go slackclient.EphemeralFileMessage(channel, userid, body, s)
+
+		default:
+			log.Println("[ERROR] describe unknown field")
+			s := fmt.Sprintf("Please Use: %s describe [check|entity] [name] [namespace]", config.SensuSlashCommand)
+			go slackclient.EphemeralMessage(channel, userid, s)
+		}
+
 	default:
 		log.Println("[ERROR] unknown action")
+		s := fmt.Sprintf("Please Use: %s [get|execute|silence|describe] [check|entity] [name] [namespace]", config.SensuSlashCommand)
+		go slackclient.EphemeralMessage(channel, userid, s)
 	}
 }
 
 // sensuGet func
-func sensuGet(token string, url string) (string, string, error) {
+func sensuGet(token string, url string, output string) (string, string, error) {
 	client := &http.Client{
 		Timeout: time.Second * 10,
 	}
@@ -147,16 +179,30 @@ func sensuGet(token string, url string) (string, string, error) {
 		log.Printf("[ERROR] %s", err)
 	}
 	var s string
-	if resp.StatusCode == 200 {
-		var result map[string]interface{}
-		json.Unmarshal(bodyText, &result)
-		check := result["check"].(map[string]interface{})
-		entity := result["entity"].(map[string]interface{})
-		details := entity["system"].(map[string]interface{})
-		s = fmt.Sprintf("Hostname: %s, %s, %s, Check Output: \n%s", details["hostname"], details["platform"], details["platform_version"], check["output"])
-	} else {
-		s = "Not Found"
+	switch output {
+	case outputParsed:
+		if resp.StatusCode == 200 {
+			var result map[string]interface{}
+			json.Unmarshal(bodyText, &result)
+			check := result["check"].(map[string]interface{})
+			entity := result["entity"].(map[string]interface{})
+			details := entity["system"].(map[string]interface{})
+			s = fmt.Sprintf("Hostname: %s, %s, %s, Check Output: \n%s", details["hostname"], details["platform"], details["platform_version"], check["output"])
+		} else {
+			s = notFound
+		}
+
+	case outputJSON:
+		if resp.StatusCode == 200 {
+			s = string(bodyText)
+		} else {
+			s = notFound
+		}
+
+	default:
+		log.Println("[ERROR] unknown output method")
 	}
+
 	defer resp.Body.Close()
 	return resp.Status, s, nil
 }
