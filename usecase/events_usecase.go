@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/betorvs/sensu-go-slack-bot/config"
-	"github.com/betorvs/sensu-go-slack-bot/gateway/sensuclient"
 	"github.com/nlopes/slack"
 )
 
@@ -32,7 +31,7 @@ func SlashCommandHandler(data *slack.SlashCommand) (slack.Msg, error) {
 			check := values[1]
 			server := values[2]
 			namespace := values[3]
-			go sensuclient.Connect(action, check, server, namespace, data.UserID, data.ChannelID)
+			go SensuConnect(action, check, server, namespace, data.UserID, data.ChannelID)
 			text := fmt.Sprintf("Check: %s, Server: %s, Namespace: %s, Processing...", check, server, namespace)
 			message := slack.Msg{
 				ResponseType: "in_channel",
