@@ -71,6 +71,8 @@ $ docker run --link sensu-backend -d --name sensu-agent sensu/sensu:latest sensu
 $ sensuctl configure -n --username 'admin' --password 'DEFAULT' --namespace default --url 'http://127.0.0.1:8080'
 ```
 
+Configure the Slack App to use Request URL in your local environment with [ngrok](https://ngrok.com/).
+
 ## Configuration 
 
 You need to configure these for local tests or real deployment.
@@ -144,9 +146,36 @@ Get a result:
 
 ![](https://media.giphy.com/media/huVF9yP2Fc2csGJJ76/giphy.gif)
 
+### Special Commands
+
 Describe a entity (Server):
 
 ![](https://media.giphy.com/media/XFw9ZdmdKGgkmUIQ9Z/giphy.gif)
+
+Describe an entity:
+
+```sh
+/sensu-go describe entity 2e0b36603488 default
+```
+
+Describe a check:
+
+```sh
+/sensu-go describe check list-process default
+```
+
+Get all checks:
+
+```sh
+/sensu-go get all check default
+```
+
+Get all entities:
+
+```sh
+/sensu-go get all entity default
+```
+
 
 ## Reference
 
