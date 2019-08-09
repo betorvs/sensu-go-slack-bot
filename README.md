@@ -78,12 +78,12 @@ Configure the Slack App to use Request URL in your local environment with [ngrok
 You need to configure these for local tests or real deployment.
 
 Configure these environment variables:
-* **SENSU_USER**=sensu-go-bot : same user create in Sensu-Go API.
-* **SENSU_URL**=https://SENSU-URL:8080 : Keep without a slash '/' in the end.
-* **SENSU_SECRET**"" : Sensu bot password 
-* **SLACK_TOKEN** : App token from Oauth in Slack (start with xoxb-)
-* **SLACK_SIGNING_SECRET** : App Signing secret from Slack App.
-* **SLACK_CHANNEL** : Channel to listen.
+* **SENSU_USER**="sensu-go-bot": same user create in Sensu-Go API.
+* **SENSU_URL**="https://SENSU-URL:8080": Keep without a slash '/' in the end.
+* **SENSU_SECRET**: Sensu bot password 
+* **SLACK_TOKEN**: App token from Oauth in Slack (start with xoxb-)
+* **SLACK_SIGNING_SECRET**: App Signing secret from Slack App.
+* **SLACK_CHANNEL**: Channel to listen.
 
 In Kubernetes deployments you can use secrets for these 3 last variables.
 
