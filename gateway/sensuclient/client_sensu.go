@@ -14,7 +14,9 @@ import (
 
 const (
 	outputJSON   = "json"
-	outputParsed = "parsed"
+	outputEvent  = "event"
+	outputCheck  = "check"
+	outputEntity = "entity"
 	notFound     = "Not Found"
 )
 
@@ -73,7 +75,7 @@ func SensuGet(token string, url string, output string) (string, string, error) {
 	}
 	var s string
 	switch output {
-	case outputParsed:
+	case outputEvent:
 		if resp.StatusCode == 200 {
 			var result map[string]interface{}
 			json.Unmarshal(bodyText, &result)
@@ -81,6 +83,34 @@ func SensuGet(token string, url string, output string) (string, string, error) {
 			entity := result["entity"].(map[string]interface{})
 			details := entity["system"].(map[string]interface{})
 			s = fmt.Sprintf("Hostname: %s, %s, %s, Check Output: \n%s", details["hostname"], details["platform"], details["platform_version"], check["output"])
+		} else {
+			s = notFound
+		}
+
+	case outputEntity:
+		if resp.StatusCode == 200 {
+			var results []map[string]interface{}
+			json.Unmarshal(bodyText, &results)
+			for _, result := range results {
+				entityClass := result["entity_class"]
+				system := result["system"].(map[string]interface{})
+				s += fmt.Sprintf("Hostname: %s, OS: %s %s, Version: %s, Entity Class: %s \n", system["hostname"], system["os"], system["platform"], system["platform_version"], entityClass)
+			}
+		} else {
+			s = notFound
+		}
+
+	case outputCheck:
+		if resp.StatusCode == 200 {
+			var results []map[string]interface{}
+			json.Unmarshal(bodyText, &results)
+			for _, result := range results {
+				command := result["command"]
+				handlers := result["handlers"]
+				subscriptions := result["subscriptions"]
+				metadata := result["metadata"].(map[string]interface{})
+				s += fmt.Sprintf("Check: %s, Command: %s, Namespace: %s, Subscriptions: %s, Handler: %s\n", metadata["name"], command, metadata["namespace"], subscriptions, handlers)
+			}
 		} else {
 			s = notFound
 		}

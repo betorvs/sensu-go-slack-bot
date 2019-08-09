@@ -13,7 +13,9 @@ import (
 // const
 const (
 	outputJSON   = "json"
-	outputParsed = "parsed"
+	outputEvent  = "event"
+	outputCheck  = "check"
+	outputEntity = "entity"
 	notFound     = "Not Found"
 )
 
@@ -45,12 +47,39 @@ func SensuConnect(action string, check string, server string, namespace string, 
 	}
 	switch action {
 	case "get":
-		sensuURL := fmt.Sprintf("%s/api/core/v2/namespaces/%s/events/%s/%s", config.SensuGoURL, namespace, server, check)
-		s, body, err := sensuclient.SensuGet(token, sensuURL, outputParsed)
-		if err != nil {
-			log.Printf("[ERROR]: %s", err)
+		switch check {
+		case "all":
+			switch server {
+			case "entity":
+				sensuURL := fmt.Sprintf("%s/api/core/v2/namespaces/%s/entities", config.SensuGoURL, namespace)
+				s, body, err := sensuclient.SensuGet(token, sensuURL, outputEntity)
+				if err != nil {
+					log.Printf("[ERROR]: %s", err)
+				}
+				go slackclient.EphemeralFileMessage(channel, userid, body, s)
+
+			case "check":
+				sensuURL := fmt.Sprintf("%s/api/core/v2/namespaces/%s/checks", config.SensuGoURL, namespace)
+				s, body, err := sensuclient.SensuGet(token, sensuURL, outputCheck)
+				if err != nil {
+					log.Printf("[ERROR]: %s", err)
+				}
+				go slackclient.EphemeralFileMessage(channel, userid, body, s)
+
+			default:
+				log.Println("[ERROR] get all with 3rd field wrong")
+				s := fmt.Sprintf("Please Use: %s get all [check|entity] [namespace]", config.SensuSlashCommand)
+				go slackclient.EphemeralMessage(channel, userid, s)
+			}
+
+		default:
+			sensuURL := fmt.Sprintf("%s/api/core/v2/namespaces/%s/events/%s/%s", config.SensuGoURL, namespace, server, check)
+			s, body, err := sensuclient.SensuGet(token, sensuURL, outputEvent)
+			if err != nil {
+				log.Printf("[ERROR]: %s", err)
+			}
+			go slackclient.EphemeralFileMessage(channel, userid, body, s)
 		}
-		go slackclient.EphemeralFileMessage(channel, userid, body, s)
 
 	case "execute":
 		entity := fmt.Sprintf("entity:%s", server)
