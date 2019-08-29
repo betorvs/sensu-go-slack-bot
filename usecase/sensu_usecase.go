@@ -52,7 +52,7 @@ func SensuConnect(action string, check string, server string, namespace string, 
 			switch server {
 			case "entity":
 				sensuURL := fmt.Sprintf("%s/api/core/v2/namespaces/%s/entities", config.SensuGoURL, namespace)
-				s, body, err := sensuclient.SensuGet(token, sensuURL, outputEntity)
+				s, body, err := sensuclient.SensuGet(token.AccessToken, sensuURL, outputEntity)
 				if err != nil {
 					log.Printf("[ERROR]: %s", err)
 				}
@@ -60,7 +60,7 @@ func SensuConnect(action string, check string, server string, namespace string, 
 
 			case "check":
 				sensuURL := fmt.Sprintf("%s/api/core/v2/namespaces/%s/checks", config.SensuGoURL, namespace)
-				s, body, err := sensuclient.SensuGet(token, sensuURL, outputCheck)
+				s, body, err := sensuclient.SensuGet(token.AccessToken, sensuURL, outputCheck)
 				if err != nil {
 					log.Printf("[ERROR]: %s", err)
 				}
@@ -74,7 +74,7 @@ func SensuConnect(action string, check string, server string, namespace string, 
 
 		default:
 			sensuURL := fmt.Sprintf("%s/api/core/v2/namespaces/%s/events/%s/%s", config.SensuGoURL, namespace, server, check)
-			s, body, err := sensuclient.SensuGet(token, sensuURL, outputEvent)
+			s, body, err := sensuclient.SensuGet(token.AccessToken, sensuURL, outputEvent)
 			if err != nil {
 				log.Printf("[ERROR]: %s", err)
 			}
@@ -92,7 +92,7 @@ func SensuConnect(action string, check string, server string, namespace string, 
 			log.Printf("[ERROR] %s", err)
 		}
 		sensuURL := fmt.Sprintf("%s/api/core/v2/namespaces/%s/checks/%s/execute", config.SensuGoURL, namespace, check)
-		s, _, err := sensuclient.SensuPost(token, sensuURL, bodymarshal)
+		s, _, err := sensuclient.SensuPost(token.AccessToken, sensuURL, bodymarshal)
 		if err != nil {
 			log.Printf("[ERROR]: %s", err)
 		}
@@ -116,7 +116,7 @@ func SensuConnect(action string, check string, server string, namespace string, 
 			log.Printf("[ERROR] %s", err)
 		}
 		sensuURL := fmt.Sprintf("%s/api/core/v2/namespaces/%s/silenced", config.SensuGoURL, namespace)
-		s, _, err := sensuclient.SensuPost(token, sensuURL, bodymarshal)
+		s, _, err := sensuclient.SensuPost(token.AccessToken, sensuURL, bodymarshal)
 		if err != nil {
 			log.Printf("[ERROR]: %s", err)
 		}
@@ -127,7 +127,7 @@ func SensuConnect(action string, check string, server string, namespace string, 
 		switch check {
 		case "check":
 			sensuURL := fmt.Sprintf("%s/api/core/v2/namespaces/%s/checks/%s", config.SensuGoURL, namespace, server)
-			s, body, err := sensuclient.SensuGet(token, sensuURL, outputJSON)
+			s, body, err := sensuclient.SensuGet(token.AccessToken, sensuURL, outputJSON)
 			if err != nil {
 				log.Printf("[ERROR]: %s", err)
 			}
@@ -135,7 +135,7 @@ func SensuConnect(action string, check string, server string, namespace string, 
 
 		case "entity":
 			sensuURL := fmt.Sprintf("%s/api/core/v2/namespaces/%s/entities/%s", config.SensuGoURL, namespace, server)
-			s, body, err := sensuclient.SensuGet(token, sensuURL, outputJSON)
+			s, body, err := sensuclient.SensuGet(token.AccessToken, sensuURL, outputJSON)
 			if err != nil {
 				log.Printf("[ERROR]: %s", err)
 			}

@@ -20,15 +20,22 @@ const (
 	notFound     = "Not Found"
 )
 
-// sensuToken struct
-type sensuToken struct {
+// SensuToken struct
+type SensuToken struct {
 	AccessToken  string `json:"access_token,omitempty"`
 	ExpiresAt    string `json:"expires_at,omitempty"`
 	RefreshToken string `json:"refresh_token,omitempty"`
 }
 
+var currentToken = SensuToken{}
+
 // BasicAuth func go to sensu api and get a new token
-func BasicAuth() (string, error) {
+func BasicAuth() (*SensuToken, error) {
+	if currentToken.AccessToken != "" &&
+		currentToken.ExpiresAt > string(time.Now().Unix()) {
+		return &currentToken, nil
+	}
+
 	client := &http.Client{
 		Timeout: time.Second * 10,
 	}
@@ -46,10 +53,10 @@ func BasicAuth() (string, error) {
 	if err != nil {
 		log.Printf("[ERROR]: %s", err)
 	}
-	data := new(sensuToken)
-	json.Unmarshal(bodyText, &data)
+	currentToken := new(SensuToken)
+	json.Unmarshal(bodyText, &currentToken)
 	defer resp.Body.Close()
-	return data.AccessToken, nil
+	return currentToken, nil
 }
 
 // SensuGet func
