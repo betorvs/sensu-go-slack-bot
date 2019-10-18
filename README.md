@@ -55,9 +55,9 @@ I create the sensu-go-slack-bot using these commands:
 ```sh
 sensuctl user create sensu-go-bot --password "LONGPASSWORD"
 
-sensuctl cluster-role create sensu-go-bot-role --verb get,list,create,update --resource checks,events,silenced,entities --namespace prod
+sensuctl cluster-role create sensu-go-bot-role --verb get,list,create,update --resource checks,events,silenced,entities --namespace default
 
-sensuctl cluster-role-binding create sensu-go-bot-rolebinding --cluster-role=sensu-go-bot-role --user=sensu-go-bot --namespace prod
+sensuctl cluster-role-binding create sensu-go-bot-rolebinding --cluster-role=sensu-go-bot-role --user=sensu-go-bot --namespace default
 
 ```
 
