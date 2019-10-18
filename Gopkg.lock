@@ -221,6 +221,7 @@
     "github.com/labstack/echo",
     "github.com/labstack/echo/middleware",
     "github.com/nlopes/slack",
+    "github.com/prometheus/client_golang/prometheus",
     "github.com/prometheus/client_golang/prometheus/promhttp",
   ]
   solver-name = "gps-cdcl"
